@@ -15,15 +15,52 @@ import ta
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import warnings
+import os
 warnings.filterwarnings('ignore')
 
-# 설정 파일 불러오기
-try:
-    from config import *
-except ImportError:
-    print("❌ config.py 파일이 없습니다!")
-    print("📝 config.example.py를 config.py로 복사하고 설정을 입력하세요.")
-    exit(1)
+# ============================================
+# 환경변수에서 설정 불러오기
+# ============================================
+
+# 텔레그램 봇 설정 (필수)
+BOT_TOKEN = os.environ.get('BOT_TOKEN', '')
+CHAT_ID = os.environ.get('CHAT_ID', '')
+
+# 모니터링 설정 (선택)
+SCAN_INTERVAL = int(os.environ.get('SCAN_INTERVAL', '300'))
+VOLUME_THRESHOLD_WATCH = float(os.environ.get('VOLUME_THRESHOLD_WATCH', '1.5'))
+VOLUME_THRESHOLD_STRONG = float(os.environ.get('VOLUME_THRESHOLD_STRONG', '2.0'))
+
+# 신호 강도 설정 (선택)
+SIGNAL_THRESHOLD_STRONG = int(os.environ.get('SIGNAL_THRESHOLD_STRONG', '7'))
+SIGNAL_THRESHOLD_MEDIUM = int(os.environ.get('SIGNAL_THRESHOLD_MEDIUM', '5'))
+
+# 출력 파일 설정 (선택)
+EXCEL_FILE = os.environ.get('EXCEL_FILE', 'upbit_signals.xlsx')
+
+# 필수 설정 확인
+if not BOT_TOKEN or not CHAT_ID:
+    print("❌ 텔레그램 설정이 없습니다!")
+    print("\n📝 설정 방법:")
+    print("1. GitHub Actions 사용시: Repository Settings → Secrets에 등록")
+    print("   - BOT_TOKEN: 텔레그램 봇 토큰")
+    print("   - CHAT_ID: 텔레그램 채팅 ID")
+    print("\n2. 로컬 실행시: 환경변수로 설정")
+    print("   export BOT_TOKEN='your_bot_token'")
+    print("   export CHAT_ID='your_chat_id'")
+    print("\n3. 또는 config.py 파일 생성:")
+    print("   config.example.py를 config.py로 복사 후 값 입력")
+    
+    # config.py가 있으면 불러오기 시도
+    try:
+        from config import BOT_TOKEN as CONFIG_BOT_TOKEN
+        from config import CHAT_ID as CONFIG_CHAT_ID
+        BOT_TOKEN = CONFIG_BOT_TOKEN
+        CHAT_ID = CONFIG_CHAT_ID
+        print("\n✅ config.py에서 설정을 불러왔습니다.")
+    except ImportError:
+        print("\n❌ config.py 파일도 없습니다. 프로그램을 종료합니다.")
+        exit(1)
 
 # ============================================
 # 텔레그램 전송 함수
