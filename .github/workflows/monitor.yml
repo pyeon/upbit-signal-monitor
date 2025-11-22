@@ -1,0 +1,61 @@
+name: Upbit Signal Monitor
+
+on:
+  schedule:
+    # 5분마다 실행 (UTC 기준)
+    - cron: '*/5 * * * *'
+  
+  # 수동 실행 가능
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create config file
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        CHAT_ID: ${{ secrets.CHAT_ID }}
+      run: |
+        cat > config.py << EOF
+        # Auto-generated config for GitHub Actions
+        BOT_TOKEN = "$BOT_TOKEN"
+        CHAT_ID = "$CHAT_ID"
+        
+        # 모니터링 설정
+        SCAN_INTERVAL = 300
+        VOLUME_THRESHOLD_WATCH = 1.5
+        VOLUME_THRESHOLD_STRONG = 2.0
+        
+        # 신호 강도 설정
+        SIGNAL_THRESHOLD_STRONG = 7
+        SIGNAL_THRESHOLD_MEDIUM = 5
+        
+        # 출력 파일 설정
+        EXCEL_FILE = "upbit_signals.xlsx"
+        EOF
+    
+    - name: Run monitor
+      run: python upbit_monitor.py
+    
+    - name: Upload Excel file
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: upbit-signals
+        path: upbit_signals.xlsx
+        retention-days: 7
