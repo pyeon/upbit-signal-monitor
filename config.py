@@ -3,14 +3,9 @@
 # ============================================
 # 
 # 사용법:
-# 1. 이 파일을 'config.py'로 복사
 # 2. 아래 값들을 본인의 정보로 수정
 # 3. config.py는 .gitignore에 포함되어 있어 GitHub에 올라가지 않음
 #
-
-# 텔레그램 봇 설정
-BOT_TOKEN = "8230667492:AAG2_-o3dd3VLMdVqi9s-jTzslcBYFA5ej0"  # 텔레그램 BotFather에서 받은 토큰
-CHAT_ID = "-5091161755"      # 그룹 ID (음수) 또는 개인 ID (양수)
 
 # 모니터링 설정
 SCAN_INTERVAL = 300  # 스캔 주기 (초 단위, 300 = 5분)
