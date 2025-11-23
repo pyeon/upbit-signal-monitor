@@ -4,18 +4,21 @@ __pycache__/
 *$py.class
 *.so
 .Python
-venv/
 env/
+venv/
 ENV/
+build/
+dist/
+*.egg-info/
 
-# 설정 파일 (민감 정보)
+# Config files with secrets
 config.py
 .env
 
-# 출력 파일
+# Excel output files
 *.xlsx
-*.csv
-*.log
+upbit_signals*.xlsx
+upbit_fast_signals.xlsx
 
 # IDE
 .vscode/
@@ -28,5 +31,5 @@ config.py
 .DS_Store
 Thumbs.db
 
-# Jupyter Notebook
-.ipynb_checkpoints/
+# Logs
+*.log
