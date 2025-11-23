@@ -1,0 +1,43 @@
+name: Upbit Enhanced Monitor
+
+on:
+  schedule:
+    # 3분마다 실행
+    - cron: '*/3 * * * *'
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install pyupbit pandas numpy requests pytz ta openpyxl
+      
+      - name: Run Enhanced Monitor
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          SCAN_INTERVAL: 180
+          VOLUME_THRESHOLD_WATCH: 1.3
+          SIGNAL_THRESHOLD_STRONG: 6
+          EXCEL_FILE: upbit_signals_enhanced.xlsx
+        run: |
+          python upbit_monitor_enhanced.py
+      
+      - name: Upload signals (optional)
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: enhanced-signals
+          path: upbit_signals_enhanced.xlsx
+          retention-days: 7
