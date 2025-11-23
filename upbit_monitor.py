@@ -11,12 +11,22 @@ import numpy as np
 import requests
 import time
 from datetime import datetime, timedelta
+import pytz  # 한국 시간대 사용을 위해 추가
 import ta
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import warnings
 import os
 warnings.filterwarnings('ignore')
+
+# ============================================
+# 한국 시간대 설정
+# ============================================
+KST = pytz.timezone('Asia/Seoul')
+
+def get_kst_now():
+    """한국 시간 반환"""
+    return datetime.now(KST)
 
 # ============================================
 # 환경변수에서 설정 불러오기
@@ -356,7 +366,7 @@ def format_telegram_message(coin, score, signals, volume_data, indicators, order
     
     message += "\n━━━━━━━━━━━━━━━━━━━━━\n"
     message += f"🎯 종합판단: {score}/9 지표 일치\n"
-    message += f"⏰ 발생시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    message += f"⏰ 발생시각: {get_kst_now().strftime('%Y-%m-%d %H:%M:%S')}"  # 한국 시간으로 변경
     
     return message
 
@@ -387,9 +397,9 @@ def save_to_excel(coin, score, volume_data, indicators, orderbook_data):
                 cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
                 cell.alignment = Alignment(horizontal="center")
         
-        # 데이터 추가
+        # 데이터 추가 (한국 시간으로 변경)
         row_data = [
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            get_kst_now().strftime('%Y-%m-%d %H:%M:%S'),
             coin.replace('KRW-', ''),
             f"{score}/9",
             volume_data['current_price'] if volume_data else '',
@@ -424,7 +434,7 @@ def save_to_excel(coin, score, volume_data, indicators, orderbook_data):
 def scan_upbit_market():
     """업비트 전체 시장 스캔"""
     print(f"\n{'='*50}")
-    print(f"🔍 스캔 시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"🔍 스캔 시작: {get_kst_now().strftime('%Y-%m-%d %H:%M:%S')}")  # 한국 시간으로 변경
     print(f"{'='*50}\n")
     
     # 원화 마켓 코인 리스트
