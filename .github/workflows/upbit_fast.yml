@@ -1,0 +1,43 @@
+name: Upbit Fast Detector
+
+on:
+  schedule:
+    # 2분마다 실행
+    - cron: '*/2 * * * *'
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install pyupbit pandas numpy requests pytz openpyxl
+      
+      - name: Run Fast Detector
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          SCAN_INTERVAL: 120
+          VOLUME_SPIKE_THRESHOLD: 1.8
+          PRICE_CHANGE_THRESHOLD: 2.5
+          EXCEL_FILE: upbit_fast_signals.xlsx
+        run: |
+          python upbit_fast_detector.py
+      
+      - name: Upload signals (optional)
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: fast-signals
+          path: upbit_fast_signals.xlsx
+          retention-days: 7
